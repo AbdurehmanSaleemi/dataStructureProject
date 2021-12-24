@@ -62,13 +62,11 @@ public:
         this->sizeOfHeap = 0;
     }
 
-    PriorityQueue buildQueue(const T* arr){
-        PriorityQueue<operationEntity<T>> pq(arr.size());
-        for(int i = 0; i < arr.size(); i++){
-            pq.insert(arr[i]);
+    PriorityQueue buildQueue(operationEntity<T> * arr){
+        for(int i = 0; i < capacityOfHeap; i++){
+            heap.insert(heap.end(), arr[i]);
         }
-        sort_heap(temp.begin(), temp.end(), greater<int>());
-        return temp;
+        return *this;
     }
 
     void insert(operationEntity<T> entity){
@@ -96,7 +94,9 @@ public:
     // print the heap
     void print(){
         for(int i = 0; i < sizeOfHeap; i++){
-            cout << heap[i].key << endl;
+            cout << heap[i].key << " ";
+            cout << heap[i]._usr.getOperationType() << " ";
+            cout << endl;
         }
         cout << endl;
     }
@@ -114,7 +114,13 @@ int main(){
     arr[0] = 2; arr[1] = 3; arr[2] = 4; arr[3] = 5; arr[4] = 6;
     PriorityQueue<int> pq(5);
     PriorityQueue<int> temp(5);
-    temp = pq.buildQueue(arr);
+    operationEntity <int> *entity = new operationEntity<int>[5];
+    for(int i = 0; i < 5; i++){
+        entity[i].key = arr[i];
+        entity[i]._usr.setUserInfo(i, "insert");
+        pq.insert(entity[i]);
+    }
+    temp = pq.buildQueue(entity);
     temp.print();
     return 0;
 }
