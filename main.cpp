@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <list>
 #include <vector>
 using namespace std;
 
@@ -165,52 +166,94 @@ public:
     }
 };
 
+template <typename T>
+struct Node
+{
+    PriorityQueue<T> *userQueue;
+    int size;
+    // Node* next;
+    T fileId;
+
+    Node()
+    {
+        userQueue = new PriorityQueue<T>(20);
+        this->size = 20;
+    }
+    Node(int size)
+    {
+        userQueue = new PriorityQueue<T>(size);
+        this->size = size;
+    }
+
+    T getFileId()
+    {
+        return fileId;
+    }
+};
+
+template <class T>
+class HashTable
+{
+private:
+    list<Node<T>> *files;
+    int sizeOfTable;
+
+public:
+    HashTable()
+    {
+        this->sizeOfTable = 20;
+        files = new list<Node<T>>[sizeOfTable];
+    }
+    HashTable(int size)
+    {
+        this->sizeOfTable = size;
+        files = new list<Node<T>>[sizeOfTable];
+    }
+
+    int calculateHash(int key)
+    {
+        return key % sizeOfTable;
+    }
+
+    void insert(T fileId)
+    {
+        int hash = calculateHash(fileId);
+        Node<T> *node = new Node<T>(20);
+        node->fileId = fileId;
+        files[hash].push_back(*node);
+    }
+
+    void print()
+    {
+        for (int i = 0; i < sizeOfTable; i++)
+        {
+            cout << "Hash value " << i << ": ";
+            for (auto it = files[i].begin(); it != files[i].end(); it++)
+            {
+                cout << it->fileId << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    ~HashTable()
+    {
+        delete[] files;
+    }
+};
+
 int main()
 {
-
-    // PriorityQueue<int> pq(5);
-    // pq.insert(operationEntity<int>{1, userInfo(1, "insert")});
-    // pq.insert(operationEntity<int>{2, userInfo(2, "insert")});
-    // pq.insert(operationEntity<int>{3, userInfo(3, "insert")});
-    // pq.insert(operationEntity<int>{4, userInfo(4, "insert")});
-    // pq.print();
-
-    int *arr = new int[5];
-    arr[0] = 2;
-    arr[1] = 3;
-    arr[2] = 4;
-    arr[3] = 5;
-    arr[4] = 6;
-    PriorityQueue<int> pq(5);
-    PriorityQueue<int> temp(5);
-    operationEntity<int> *entity = new operationEntity<int>[5];
-    entity[0].key = 5;
-    entity[1].key = 2;
-    entity[2].key = 7;
-    entity[3].key = 1;
-    entity[4].key = 3;
-    for (int i = 0; i < 5; i++)
-    {
-        entity[i]._usr.setUserInfo(i, "insert");
-        pq.insertData(entity[i]);
-    }
-    temp = pq.buildQueue(entity);
-    temp.print();
-    //pq.print();
-    PriorityQueue<int> pq1(5);
-    if (temp.findMax() != -1)
-    {
-        cout << "Max = " << temp.findMax() << endl;
-    }
-    // if (pq1.findMin() != -1)
-    // {
-    //     cout << temp.findMin() << endl;
-    // }
-    temp.size();
-
-    temp.clearHeap();
-
-    //after clearing heap
-    temp.print();
+    HashTable<int> table(20);
+    table.insert(5100);
+    table.insert(5200);
+    table.insert(5300);
+    table.insert(5101);
+    table.insert(6101);
+    table.insert(6102);
+    table.insert(55103);
+    table.insert(66102);
+    table.insert(6103);
+    table.print();
     return 0;
 }
