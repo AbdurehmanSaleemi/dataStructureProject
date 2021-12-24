@@ -3,97 +3,150 @@
 #include <vector>
 using namespace std;
 
-class userInfo{
+class userInfo
+{
 private:
     int id;
     string operationType;
+
 public:
-    userInfo(){
+    userInfo()
+    {
         id = 0;
         operationType = "";
     }
 
     // parameterized constructor
-    userInfo(int id, string operationType){
+    userInfo(int id, string operationType)
+    {
         this->id = id;
         this->operationType = operationType;
     }
 
     // --- funxtion to set userInformation
-    void setUserInfo(int id, string operationType){
+    void setUserInfo(int id, string operationType)
+    {
         this->id = id;
         this->operationType = operationType;
     }
 
     // --- to access info out of the class
-    int getUserId() const{
+    int getUserId() const
+    {
         return this->id;
     }
-    string getOperationType(){
+    string getOperationType()
+    {
         return this->operationType;
     }
 
-    void print(){
+    void print()
+    {
         cout << this->id << " " << this->operationType << endl;
     }
-
 };
-
 
 // heapItem class
 template <typename T>
-class operationEntity{
+class operationEntity
+{
 public:
-    T key;            // key to insert data into heap
-    userInfo _usr;      // object of user class
+    T key;         // key to insert data into heap
+    userInfo _usr; // object of user class
 };
 
 template <typename T>
-class PriorityQueue{
+class PriorityQueue
+{
 private:
     vector<operationEntity<T>> heap;
-    int sizeOfHeap;                 // Current number of elements in min heap
-    int capacityOfHeap;             // maximum possible size of min heap
+    int sizeOfHeap;     // Current number of elements in min heap
+    int capacityOfHeap; // maximum possible size of min heap
 
 public:
-
-    PriorityQueue(int capacity){
+    PriorityQueue(int capacity)
+    {
         this->capacityOfHeap = capacity;
         this->sizeOfHeap = 0;
     }
 
-    PriorityQueue buildQueue(operationEntity<T> * arr){
-        for(int i = 0; i < capacityOfHeap; i++){
-            heap.insert(heap.end(), arr[i]);
+    void sort(){
+        for (int i = 0; i < sizeOfHeap; i++)
+        {
+            for (int j = 0; j < sizeOfHeap - i - 1; j++)
+            {
+                if (heap[j].key < heap[j + 1].key)
+                {
+                    swap(heap[j], heap[j + 1]);
+                }
+            }
         }
-        return *this;
     }
 
-    void insert(operationEntity<T> entity){
-        if(sizeOfHeap == capacityOfHeap){
+    void insertData(operationEntity<T> entity)
+    {
+        if (sizeOfHeap == capacityOfHeap)
+        {
             cout << "Heap is full" << endl;
             return;
         }
-        heap.push_back(entity);
+        heap.insert(heap.begin(), entity);
         sizeOfHeap++;
         int index = sizeOfHeap - 1;
-        while(index != 0 && heap[index].key < heap[(index - 1) / 2].key){
+        while (index != 0 && heap[index].key < heap[(index - 1) / 2].key)
+        {
             swap(heap[index], heap[(index - 1) / 2]);
             index = (index - 1) / 2;
         }
     }
 
-    T findMax(){
-        return heap[0];     // return first index
+    //takes unsorted array and covert it into a priority queue
+    PriorityQueue buildQueue(operationEntity<T> *arr)
+    {
+        PriorityQueue<T> pq(this->capacityOfHeap);
+        for (int i = 0; i < this->capacityOfHeap; i++)
+        {
+            pq.insertData(arr[i]);
+        }
+        pq.sort();
+        return pq;
     }
 
-    T findMin(){
-        return heap[heap.size()];   // return last index.
+    T findMax()
+    {
+        if (sizeOfHeap == 0)
+        {
+            cout << "Heap is empty" << endl;
+            return -1;
+        }
+        return heap[0].key;
+    }
+
+    T findMin()
+    {
+        if (sizeOfHeap == 0)
+        {
+            cout << "Heap is empty" << endl;
+            return -1;
+        }
+        return heap[sizeOfHeap - 1].key;
+    }
+
+    void sizeOfHeap()
+    {
+        cout << "Size of heap is " << sizeOfHeap << endl;
+    }
+
+    void clearHeap(){
+        heap.clear();
+        sizeOfHeap = 0;
     }
 
     // print the heap
-    void print(){
-        for(int i = 0; i < sizeOfHeap; i++){
+    void print()
+    {
+        for (int i = 0; i < sizeOfHeap; i++)
+        {
             cout << heap[i].key << " ";
             cout << heap[i]._usr.getOperationType() << " ";
             cout << endl;
@@ -102,8 +155,8 @@ public:
     }
 };
 
-
-int main(){
+int main()
+{
 
     // PriorityQueue<int> pq(5);
     // pq.insert(operationEntity<int>{1, userInfo(1, "insert")});
@@ -113,16 +166,35 @@ int main(){
     // pq.print();
 
     int *arr = new int[5];
-    arr[0] = 2; arr[1] = 3; arr[2] = 4; arr[3] = 5; arr[4] = 6;
+    arr[0] = 2;
+    arr[1] = 3;
+    arr[2] = 4;
+    arr[3] = 5;
+    arr[4] = 6;
     PriorityQueue<int> pq(5);
     PriorityQueue<int> temp(5);
-    operationEntity <int> *entity = new operationEntity<int>[5];
-    for(int i = 0; i < 5; i++){
-        entity[i].key = arr[i];
+    operationEntity<int> *entity = new operationEntity<int>[5];
+    entity[0].key = 5;
+    entity[1].key = 2;
+    entity[2].key = 7;
+    entity[3].key = 1;
+    entity[4].key = 3;
+    for (int i = 0; i < 5; i++)
+    {
         entity[i]._usr.setUserInfo(i, "insert");
-        pq.insert(entity[i]);
+        pq.insertData(entity[i]);
     }
     temp = pq.buildQueue(entity);
     temp.print();
+    //pq.print();
+    PriorityQueue<int> pq1(5);
+    if(temp.findMax() != -1)
+    {
+        cout << temp.findMax() << endl;
+    }
+    if(pq1.findMin() != -1)
+    {
+        cout << temp.findMin() << endl;
+    }
     return 0;
 }
