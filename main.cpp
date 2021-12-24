@@ -70,7 +70,8 @@ public:
         this->sizeOfHeap = 0;
     }
 
-    void sort(){
+    void sort()
+    {
         for (int i = 0; i < sizeOfHeap; i++)
         {
             for (int j = 0; j < sizeOfHeap - i - 1; j++)
@@ -132,12 +133,13 @@ public:
         return heap[sizeOfHeap - 1].key;
     }
 
-    void sizeOfHeap()
+    void size()
     {
         cout << "Size of heap is " << sizeOfHeap << endl;
     }
 
-    void clearHeap(){
+    void clearHeap()
+    {
         heap.clear();
         sizeOfHeap = 0;
     }
@@ -145,11 +147,19 @@ public:
     // print the heap
     void print()
     {
-        for (int i = 0; i < sizeOfHeap; i++)
+        if (sizeOfHeap == 0)
         {
-            cout << heap[i].key << " ";
-            cout << heap[i]._usr.getOperationType() << " ";
-            cout << endl;
+            cout << "Heap is empty" << endl;
+            return;
+        }
+        else
+        {
+            for (int i = 0; i < sizeOfHeap; i++)
+            {
+                cout << heap[i].key << " ";
+                cout << heap[i]._usr.getOperationType() << " ";
+                cout << endl;
+            }
         }
         cout << endl;
     }
@@ -188,13 +198,19 @@ int main()
     temp.print();
     //pq.print();
     PriorityQueue<int> pq1(5);
-    if(temp.findMax() != -1)
+    if (temp.findMax() != -1)
     {
-        cout << temp.findMax() << endl;
+        cout << "Max = " << temp.findMax() << endl;
     }
-    if(pq1.findMin() != -1)
-    {
-        cout << temp.findMin() << endl;
-    }
+    // if (pq1.findMin() != -1)
+    // {
+    //     cout << temp.findMin() << endl;
+    // }
+    temp.size();
+
+    temp.clearHeap();
+
+    //after clearing heap
+    temp.print();
     return 0;
 }
