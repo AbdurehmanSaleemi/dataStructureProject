@@ -88,7 +88,7 @@ public:
     }
 
     T findMin(){
-        return heap[heap.size()];   // return last index
+        return heap[heap.size()];   // return last index.
     }
 
     // print the heap
