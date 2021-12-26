@@ -85,7 +85,7 @@ public:
         }
     }
 
-    void insertData(operationEntity<T> entity)
+    void insertData(int key, operationEntity<T> entity)
     {
         if (sizeOfHeap == capacityOfHeap)
         {
@@ -108,7 +108,7 @@ public:
         PriorityQueue<T> pq(this->capacityOfHeap);
         for (int i = 0; i < this->capacityOfHeap; i++)
         {
-            pq.insertData(arr[i]);
+            pq.insertData(arr[i]->key, arr[i]);
         }
         pq.sort();
         return pq;
@@ -132,6 +132,10 @@ public:
             return -1;
         }
         return heap[sizeOfHeap - 1].key;
+    }
+
+    void setKey(int priority, int index){
+        heap[index].key = priority;
     }
 
     void size()
@@ -236,6 +240,53 @@ public:
         }
     }
 
+    void request_access(int user_id, int file_id)
+    {
+        int check = 0;                  // to keep the check in loop
+        int f = calculateHash(file_id); // to calculate the index by hashing
+        for (auto it = files[f].begin(); it != files[f].end(); it++)
+        {
+            if (it->fileId == file_id) // it will see whether the file id exists
+            {
+                check = 1;
+                break;
+            }
+        }
+        if (check != 1) // if the file id doesnot exist, exit from the program
+        {
+            cout << "\n-------------The file ID you entered doesnot "
+                    "exist------------\n";
+            return;
+        }
+
+        // if file id exist, we will take the users priority
+        cout << "\nNow, we need your priority!";
+        cout << "\nFor inputting a number for priority, input 1 and for "
+                "specifying a priority as highest or lowest, press any other "
+                "number\n";
+        int a;
+        cin >> a;
+        // only these two if else conditions are left in this function, rest the
+        // function is complete
+        auto it = files[f].begin();
+        if (a == 1)
+        {
+            cout << "\nEnter your priority: ";
+            int priority;
+            cin >> priority;
+            operationEntity<T> *entity = new operationEntity<T>;
+            entity->key = priority;
+            entity->_usr.setUserInfo(user_id, "Read");
+            it->userQueue->insertData(priority, *entity);
+            it->userQueue->print();
+        }
+        else
+        {
+            // in this else condition, take highest or lowest and then find max or
+            // min  priority and insert accordingly
+        }
+    }
+
     ~HashTable()
     {
         delete[] files;
@@ -255,5 +306,6 @@ int main()
     table.insert(66102);
     table.insert(6103);
     table.print();
+    table.request_access(001, 5300);
     return 0;
 }
