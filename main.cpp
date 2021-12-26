@@ -138,9 +138,9 @@ public:
         heap[index].key = priority;
     }
 
-    void size()
+    int size()
     {
-        cout << "Size of heap is " << sizeOfHeap << endl;
+        return sizeOfHeap;  
     }
 
     void clearHeap()
@@ -161,7 +161,7 @@ public:
         {
             for (int i = 0; i < sizeOfHeap; i++)
             {
-                cout << heap[i].key << " ";
+                cout << heap[i].key << "\t";
                 cout << heap[i]._usr.getOperationType() << " ";
                 cout << endl;
             }
@@ -235,6 +235,9 @@ public:
             for (auto it = files[i].begin(); it != files[i].end(); it++)
             {
                 cout << it->fileId << " ";
+                if(it->userQueue->size() != 0){
+                    it->userQueue->print();
+                }
             }
             cout << endl;
         }
@@ -278,7 +281,6 @@ public:
             entity->key = priority;
             entity->_usr.setUserInfo(user_id, "Read");
             it->userQueue->insertData(priority, *entity);
-            it->userQueue->print();
         }
         else
         {
@@ -305,7 +307,8 @@ int main()
     table.insert(55103);
     table.insert(66102);
     table.insert(6103);
-    table.print();
     table.request_access(001, 5300);
+    cout << endl;
+    table.print();
     return 0;
 }
