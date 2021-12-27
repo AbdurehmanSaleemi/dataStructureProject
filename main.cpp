@@ -71,15 +71,17 @@ public:
         this->sizeOfHeap = 0;
     }
 
-    void sort()
+    void setCapacity(int capacity)
     {
-        for (int i = 0; i < sizeOfHeap; i++)
-        {
-            for (int j = 0; j < sizeOfHeap - i - 1; j++)
-            {
-                if (heap[j].key < heap[j + 1].key)
-                {
-                    swap(heap[j], heap[j + 1]);
+        this->capacityOfHeap = capacity;
+    }
+
+    //sort in descending order
+    void sort(){
+        for(int i=0;i<sizeOfHeap;i++){
+            for(int j=0;j<sizeOfHeap-i-1;j++){
+                if(heap[j].key<heap[j+1].key){
+                    swap(heap[j],heap[j+1]);
                 }
             }
         }
@@ -103,15 +105,19 @@ public:
     }
 
     //takes unsorted array and covert it into a priority queue
-    PriorityQueue buildQueue(operationEntity<T> *arr)
+    PriorityQueue buildQueue(PriorityQueue *arr)
     {
-        PriorityQueue<T> pq(this->capacityOfHeap);
-        for (int i = 0; i < this->capacityOfHeap; i++)
+        PriorityQueue<T> pq(arr->capacityOfHeap);
+        for (int i = 0; i < arr->capacityOfHeap; i++)
         {
-            pq.insertData(arr[i]->key, arr[i]);
+            pq.insertData(arr->heap[i].key, arr->heap[i]);
         }
         pq.sort();
         return pq;
+    }
+
+    void buildQueue(){
+        sort();
     }
 
     T findMax()
@@ -168,6 +174,49 @@ public:
         }
         cout << endl;
     }
+    void removeData(int key)
+    {
+        if (sizeOfHeap == 0)
+        {
+            cout << "Heap is empty" << endl;
+            return;
+        }
+        int index = 0;
+        while (index < sizeOfHeap && heap[index].key != key)
+        {
+            index++;
+        }
+        if (index == sizeOfHeap)
+        {
+            cout << "Key not found" << endl;
+            return;
+        }
+        heap[index] = heap[sizeOfHeap - 1];
+        sizeOfHeap--;
+        int parent = (index - 1) / 2;
+        while (index > 0 && heap[index].key < heap[parent].key)
+        {
+            swap(heap[index], heap[parent]);
+            index = parent;
+            parent = (index - 1) / 2;
+        }
+    }
+
+    int getUserId(){
+        return heap[0]._usr.getUserId();
+    }
+
+    string getOperationType(){
+        return heap[0]._usr.getOperationType();
+    }
+
+    T getKey(){
+        return heap[0].key;
+    }
+
+    userInfo getUserInfo(){
+        return heap[0]._usr;
+    }
 };
 
 template <typename T>
@@ -175,17 +224,19 @@ struct Node
 {
     PriorityQueue<T> *userQueue;
     int size;
-    // Node* next;
+    PriorityQueue<T> *tempQueue;
     T fileId;
 
     Node()
     {
         userQueue = new PriorityQueue<T>(20);
+        tempQueue = new PriorityQueue<T>(20);
         this->size = 20;
     }
     Node(int size)
     {
         userQueue = new PriorityQueue<T>(size);
+        tempQueue = new PriorityQueue<T>(size);
         this->size = size;
     }
 
@@ -236,56 +287,83 @@ public:
             {
                 cout << it->fileId << " ";
                 if(it->userQueue->size() != 0){
-                    it->userQueue->print();
+                    cout << endl;
+                    PriorityQueue<T> pq = *it->userQueue;
+                    pq.print();
                 }
             }
             cout << endl;
         }
     }
 
-    void request_access(int user_id, int file_id)
-    {
-        int check = 0;                  // to keep the check in loop
-        int f = calculateHash(file_id); // to calculate the index by hashing
-        for (auto it = files[f].begin(); it != files[f].end(); it++)
-        {
-            if (it->fileId == file_id) // it will see whether the file id exists
-            {
-                check = 1;
+    // request file access and enter the user in queue
+    void requestAccess(int userId, int priority, int fileId, string accessType){
+        int hash = calculateHash(fileId);
+        auto it = files[hash].begin();
+        while(it != files[hash].end()){
+            if(it->fileId == fileId){
+                operationEntity<T> *entity = new operationEntity<T>;
+                entity->key = priority;
+                entity->_usr.setUserInfo(userId, accessType);
+                it->userQueue->insertData(priority,*entity);
+                cout << "Added in the Queue\n";
                 break;
             }
+            it++;
         }
-        if (check != 1) // if the file id doesnot exist, exit from the program
-        {
-            cout << "\n-------------The file ID you entered doesnot "
-                    "exist------------\n";
-            return;
-        }
+    }
 
-        // if file id exist, we will take the users priority
-        cout << "\nNow, we need your priority!";
-        cout << "\nFor inputting a number for priority, input 1 and for "
-                "specifying a priority as highest or lowest, press any other "
-                "number\n";
-        int a;
-        cin >> a;
-        // only these two if else conditions are left in this function, rest the
-        // function is complete
-        auto it = files[f].begin();
-        if (a == 1)
-        {
-            cout << "\nEnter your priority: ";
-            int priority;
-            cin >> priority;
-            operationEntity<T> *entity = new operationEntity<T>;
-            entity->key = priority;
-            entity->_usr.setUserInfo(user_id, "Read");
-            it->userQueue->insertData(priority, *entity);
+    void buildQueueForFile(int fileId){
+        int hash = calculateHash(fileId);
+        auto it = files[hash].begin();
+        while(it != files[hash].end()){
+            if(it->fileId == fileId){
+                it->userQueue->buildQueue();
+                break;
+            }
+            it++;
         }
-        else
-        {
-            // in this else condition, take highest or lowest and then find max or
-            // min  priority and insert accordingly
+    }
+
+    void releaseAccess(int fileId){
+        int hash = calculateHash(fileId);
+        auto it = files[hash].begin();
+        while(it != files[hash].end()){
+            if(it->fileId == fileId){
+                if(it->userQueue->getOperationType() == "Read"){
+                    while(it->userQueue->getOperationType() == "Read"){
+                        operationEntity<T> *entity = new operationEntity<T>;
+                        entity->key = it->userQueue->getKey();
+                        entity->_usr = it->userQueue->getUserInfo();
+                        it->tempQueue->insertData(it->userQueue->getKey(),*entity);
+                        it->userQueue->removeData(it->userQueue->getKey());
+                        buildQueueForFile(fileId);
+                    }
+                    break;
+                }
+                else{
+                    operationEntity<T> *entity = new operationEntity<T>;
+                    entity->key = it->userQueue->getKey();
+                    entity->_usr = it->userQueue->getUserInfo();
+                    it->tempQueue->insertData(it->userQueue->getKey(),*entity);
+                    it->userQueue->removeData(it->userQueue->getKey());
+                    buildQueueForFile(fileId);
+                }
+            }
+            it++;
+        }
+    }
+
+    void printUserAccessingFile(int fileId){
+        int hash = calculateHash(fileId);
+        auto it = files[hash].begin();
+        while(it != files[hash].end()){
+            if(it->fileId == fileId){
+                cout << "Users accessing the file: ";
+                it->tempQueue->print();
+                break;
+            }
+            it++;
         }
     }
 
@@ -307,7 +385,20 @@ int main()
     table.insert(55103);
     table.insert(66102);
     table.insert(6103);
-    table.request_access(001, 5300);
+    table.requestAccess(001, 5, 5300, "Read");
+    table.requestAccess(002, 2, 5300, "Read");
+    table.requestAccess(003, 1, 5300, "Write");
+    table.requestAccess(004, 8, 5300, "Read");
+    table.requestAccess(005, 4, 5300, "Write");
+    table.requestAccess(006, 10, 5300, "Read");
+    table.requestAccess(007, 12, 5300, "Read");
+    table.buildQueueForFile(5300);
+    cout << endl;
+    table.print();
+    cout << endl;
+    table.releaseAccess(5300);
+    cout << endl;
+    table.printUserAccessingFile(5300);
     cout << endl;
     table.print();
     return 0;
