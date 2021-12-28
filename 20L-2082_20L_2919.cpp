@@ -373,7 +373,7 @@ public:
             if(it->fileId == fileId){
                 if(it->userQueue->getOperationType() == "Read"){
                     auto tempIt = it++;         // check if next inline user wants to read too
-                    if(tempIt->userQueue->getOperationType() == "Read"){
+                    //if(tempIt->userQueue->getOperationType() == "Read"){
                         while(it->userQueue->getOperationType() == "Read"){
                             operationEntity<T> *entity = new operationEntity<T>;
                             entity->key = it->userQueue->getKey();
@@ -382,16 +382,16 @@ public:
                             it->userQueue->removeData(it->userQueue->getKey());
                             buildQueueForFile(fileId);
                         }
-                    }
-                    else{
-                        operationEntity<T> *entity = new operationEntity<T>;
-                        entity->key = it->userQueue->getKey();
-                        entity->_usr = it->userQueue->getUserInfo();
-                        it->tempQueue->insertData(it->userQueue->getKey(),*entity);
-                        it->userQueue->removeData(it->userQueue->getKey());
-                        buildQueueForFile(fileId);
-                        break;
-                    }
+                    //}
+                    // else{
+                    //     operationEntity<T> *entity = new operationEntity<T>;
+                    //     entity->key = it->userQueue->getKey();
+                    //     entity->_usr = it->userQueue->getUserInfo();
+                    //     it->tempQueue->insertData(it->userQueue->getKey(),*entity);
+                    //     it->userQueue->removeData(it->userQueue->getKey());
+                    //     buildQueueForFile(fileId);
+                    //     break;
+                    // }
                     break;
                 }
                 else{
