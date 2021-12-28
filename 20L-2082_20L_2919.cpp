@@ -61,9 +61,9 @@ template <typename T>
 class PriorityQueue
 {
 private:
-    vector<operationEntity<T>> heap;    // vector to store heap
-    int sizeOfHeap;                     // Current number of elements in min heap
-    int capacityOfHeap;                 // maximum possible size of min heap
+    vector<operationEntity<T>> heap; // vector to store heap
+    int sizeOfHeap;                  // Current number of elements in min heap
+    int capacityOfHeap;              // maximum possible size of min heap
 
 public:
     PriorityQueue(int capacity)
@@ -78,11 +78,15 @@ public:
     }
 
     //sort in descending order
-    void sort(){
-        for(int i=0;i<sizeOfHeap;i++){
-            for(int j=0;j<sizeOfHeap-i-1;j++){
-                if(heap[j].key<heap[j+1].key){
-                    swap(heap[j],heap[j+1]);
+    void sort()
+    {
+        for (int i = 0; i < sizeOfHeap; i++)
+        {
+            for (int j = 0; j < sizeOfHeap - i - 1; j++)
+            {
+                if (heap[j].key < heap[j + 1].key)
+                {
+                    swap(heap[j], heap[j + 1]);
                 }
             }
         }
@@ -96,7 +100,8 @@ public:
             cout << "Heap is full" << endl;
             return;
         }
-        else{
+        else
+        {
             heap.insert(heap.begin(), entity);
             sizeOfHeap++;
             int index = sizeOfHeap - 1;
@@ -121,7 +126,8 @@ public:
     }
 
     // build the queue
-    void buildQueue(){
+    void buildQueue()
+    {
         sort();
     }
 
@@ -148,14 +154,15 @@ public:
     }
 
     // set the key of the element at index i
-    void setKey(int priority, int index){
+    void setKey(int priority, int index)
+    {
         heap[index].key = priority;
     }
 
     // return current heap size
     int size()
     {
-        return sizeOfHeap;  
+        return sizeOfHeap;
     }
 
     // clear the heap completely
@@ -215,22 +222,36 @@ public:
         }
     }
 
-
     // these functions are returning private data
-    int getUserId(){
+    int getUserId()
+    {
         return heap[0]._usr.getUserId();
     }
 
-    string getOperationType(){
+    string getOperationType()
+    {
         return heap[0]._usr.getOperationType();
     }
 
-    T getKey(){
+    T getKey()
+    {
         return heap[0].key;
     }
 
+    bool isEmpty()
+    {
+        if (heap.empty() == true)
+        {
+            return true;
+        }
+        else
+        {
+            false;
+        }
+    }
 
-    userInfo getUserInfo(){
+    userInfo getUserInfo()
+    {
         return heap[0]._usr;
     }
 };
@@ -239,7 +260,6 @@ template <typename T>
 struct Node
 {
     PriorityQueue<T> *userQueue;
-    int size;
     PriorityQueue<T> *tempQueue;
     T fileId;
 
@@ -248,7 +268,7 @@ struct Node
     {
         userQueue = new PriorityQueue<T>(100);
         tempQueue = new PriorityQueue<T>(100);
-        this->size = 0;
+        fileId = 0;
     }
 
     // parameterized constructor
@@ -256,7 +276,7 @@ struct Node
     {
         userQueue = new PriorityQueue<T>(size + 100);
         tempQueue = new PriorityQueue<T>(size + 100);
-        this->size = 0;
+        fileId = 0;
     }
 
     T getFileId()
@@ -271,20 +291,20 @@ class HashTable
 private:
     list<Node<T>> *files;
     int sizeOfTable;
-    int size;
+    int sizeOfList;
 
 public:
     HashTable()
     {
         this->sizeOfTable = 20;
         files = new list<Node<T>>[sizeOfTable];
-        this->size = 0;
+        this->sizeOfList = 0;
     }
     HashTable(int size)
     {
         this->sizeOfTable = size;
         files = new list<Node<T>>[sizeOfTable];
-        this->size = 0;
+        this->sizeOfList = 0;
     }
 
     //hash function
@@ -309,9 +329,20 @@ public:
         }
         node->fileId = fileId;
         files[hash].push_back(*node);
-        this->size++;
     }
 
+    int getSize(int fileId)
+    {
+        int index = calculateHash(fileId);
+        for (auto it = files[index].begin(); it != files[index].end(); it++)
+        {
+            if (it->getFileId() == fileId)
+            {
+                return it->userQueue->size();
+            }
+        }
+        return -1;
+    }
 
     // This function is used to print the files in the hash Table
     void print()
@@ -320,31 +351,35 @@ public:
         {
             for (auto it = files[i].begin(); it != files[i].end(); it++)
             {
-                if(files[i].size() == 0){
+                if (files[i].size() == 0)
+                {
                     break;
                 }
                 cout << it->fileId << " ";
-                if(it->userQueue->size() != 0){
+                if (it->userQueue->size() != 0)
+                {
                     cout << endl;
                     PriorityQueue<T> pq = *it->userQueue;
                     pq.print();
                 }
                 cout << endl;
             }
-            
         }
     }
 
     // request file access and enter the user in queue
-    void requestAccess(int userId, int priority, int fileId, string accessType){
+    void requestAccess(int userId, int priority, int fileId, string accessType)
+    {
         int hash = calculateHash(fileId);
         auto it = files[hash].begin();
-        while(it != files[hash].end()){
-            if(it->fileId == fileId){
+        while (it != files[hash].end())
+        {
+            if (it->fileId == fileId)
+            {
                 operationEntity<T> *entity = new operationEntity<T>;
                 entity->key = priority;
                 entity->_usr.setUserInfo(userId, accessType);
-                it->userQueue->insertData(priority,*entity);
+                it->userQueue->insertData(priority, *entity);
                 cout << "Added in the Queue\n";
                 break;
             }
@@ -353,11 +388,14 @@ public:
     }
 
     // it will update userQueue according to the priorities
-    void buildQueueForFile(int fileId){
+    void buildQueueForFile(int fileId)
+    {
         int hash = calculateHash(fileId);
         auto it = files[hash].begin();
-        while(it != files[hash].end()){
-            if(it->fileId == fileId){
+        while (it != files[hash].end())
+        {
+            if (it->fileId == fileId)
+            {
                 it->userQueue->buildQueue();
                 break;
             }
@@ -366,42 +404,42 @@ public:
     }
 
     // this function will release file access and remove the user from queue
-    void grantAndReleaseAccess(int fileId){
+    void grantAndReleaseAccess(int fileId)
+    {
+        int tempSize = 0;
         int hash = calculateHash(fileId);
         auto it = files[hash].begin();
-        while(it != files[hash].end()){
-            if(it->fileId == fileId){
-                if(it->userQueue->getOperationType() == "Read"){
-                    auto tempIt = it++;         // check if next inline user wants to read too
-                    //if(tempIt->userQueue->getOperationType() == "Read"){
-                        while(it->userQueue->getOperationType() == "Read"){
-                            operationEntity<T> *entity = new operationEntity<T>;
-                            entity->key = it->userQueue->getKey();
-                            entity->_usr = it->userQueue->getUserInfo();
-                            it->tempQueue->insertData(it->userQueue->getKey(),*entity);
-                            it->userQueue->removeData(it->userQueue->getKey());
-                            buildQueueForFile(fileId);
-                        }
-                    //}
-                    // else{
-                    //     operationEntity<T> *entity = new operationEntity<T>;
-                    //     entity->key = it->userQueue->getKey();
-                    //     entity->_usr = it->userQueue->getUserInfo();
-                    //     it->tempQueue->insertData(it->userQueue->getKey(),*entity);
-                    //     it->userQueue->removeData(it->userQueue->getKey());
-                    //     buildQueueForFile(fileId);
-                    //     break;
-                    // }
+        while (it != files[hash].end())
+        {
+            if (it->fileId == fileId)
+            {
+                tempSize = it->userQueue->size();
+                if (it->userQueue->getOperationType() == "Read")
+                {
+                    while (it->userQueue->getOperationType() == "Read" && tempSize != 0)
+                    {
+                        operationEntity<T> *entity = new operationEntity<T>;
+                        entity->key = it->userQueue->getKey();
+                        entity->_usr = it->userQueue->getUserInfo();
+                        it->tempQueue->insertData(it->userQueue->getKey(), *entity);
+                        it->userQueue->removeData(it->userQueue->getKey());
+                        buildQueueForFile(fileId);
+                        tempSize--;
+                    }
                     break;
+                    return;
                 }
-                else{
+                else
+                {
                     operationEntity<T> *entity = new operationEntity<T>;
                     entity->key = it->userQueue->getKey();
                     entity->_usr = it->userQueue->getUserInfo();
-                    it->tempQueue->insertData(it->userQueue->getKey(),*entity);
+                    it->tempQueue->insertData(it->userQueue->getKey(), *entity);
                     it->userQueue->removeData(it->userQueue->getKey());
                     buildQueueForFile(fileId);
+                    tempSize--;
                     break;
+                    return;
                 }
             }
             it++;
@@ -409,34 +447,58 @@ public:
     }
 
     // this function will print users currently accessing the file
-    void printUserAccessingFile(int fileId){
+    void printUserAccessingFile(int fileId)
+    {
         int hash = calculateHash(fileId);
         auto it = files[hash].begin();
-        cout << "---------------------\n\n";
-        while(it != files[hash].end()){
-            if(it->fileId == fileId){
+        while (it != files[hash].end())
+        {
+            if (it->fileId == fileId)
+            {
                 cout << "Users accessing the file: " << it->fileId << "\n";
                 it->tempQueue->print();
                 break;
+                return;
             }
             it++;
         }
-        cout << "---------------------\n";
+        //cout << "File not Found\n";
     }
 
-    void printFileQueue(int fileId){
+    void printFileQueue(int fileId)
+    {
         int hash = calculateHash(fileId);
         auto it = files[hash].begin();
-        cout << "---------------------\n\n";
-        while(it != files[hash].end()){
-            if(it->fileId == fileId){
+        while (it != files[hash].end())
+        {
+            if (it->fileId == fileId)
+            {
                 cout << "Users in the queue: " << it->fileId << "\n";
                 it->userQueue->print();
                 break;
+                return;
             }
             it++;
         }
-        cout << "---------------------\n";
+        //cout << "File not Found\n";
+    }
+
+    void userInWaiting(int fileId)
+    {
+        int hash = calculateHash(fileId);
+        auto it = files[hash].begin();
+        while (it != files[hash].end())
+        {
+            if (it->fileId == fileId)
+            {
+                cout << "Users in the Waiting List: " << it->fileId << "\n";
+                it->userQueue->print();
+                break;
+                return;
+            }
+            it++;
+        }
+        //cout << "File not Found\n";
     }
 
     ~HashTable()
@@ -445,7 +507,8 @@ public:
     }
 };
 
-void readFromFile(string filename){
+void readFromFile(string filename)
+{
     HashTable<int> hashTable(20);
     ifstream file;
     file.open(filename);
@@ -453,19 +516,26 @@ void readFromFile(string filename){
     int userId[100], fileId[100], priority[100];
     string accessType[100];
     int i = 0;
-    if(file.is_open()){
-        while(!file.eof()){
+    if (file.is_open())
+    {
+        while (!file.eof())
+        {
             file >> userId[i] >> priority[i] >> fileId[i] >> accessType[i];
-            cout << userId[i] << " " << priority[i] << " " << fileId[i] << " " << accessType[i] << endl;
             hashTable.insert(fileId[i]);
             hashTable.requestAccess(userId[i], priority[i], fileId[i], accessType[i]);
             hashTable.buildQueueForFile(fileId[i]);
             i++;
         }
     }
+    cout << hashTable.getSize(7010) << endl;
+    cout << "---------------------------\n";
     hashTable.printFileQueue(7010);
     hashTable.grantAndReleaseAccess(7010);
-    //hashTable.printUserAccessingFile(7010);
+    cout << "---------------------------\n";
+    hashTable.printUserAccessingFile(7010);
+    cout << "---------------------------\n";
+    hashTable.userInWaiting(7010);
+
     file.close();
 }
 
@@ -492,7 +562,7 @@ int main()
     // cout << endl;
     // table.print();
     // cout << endl;
-    // table.grantAndReleaseAccess(5300);       
+    // table.grantAndReleaseAccess(5300);
     // cout << endl;
     // table.printUserAccessingFile(5300);
     // cout << endl;
