@@ -541,32 +541,6 @@ void readFromFile(string filename)
 
 int main()
 {
-    // HashTable<int> table(20);
-    // table.insert(5100);
-    // table.insert(5200);
-    // table.insert(5300);
-    // table.insert(5101);
-    // table.insert(6101);
-    // table.insert(6102);
-    // table.insert(55103);
-    // table.insert(66102);
-    // table.insert(6103);
-    // table.requestAccess(001, 5, 5300, "Read");
-    // table.requestAccess(002, 2, 5300, "Read");
-    // table.requestAccess(003, 1, 5300, "Write");
-    // table.requestAccess(004, 8, 5300, "Read");
-    // table.requestAccess(005, 4, 5300, "Write");
-    // table.requestAccess(006, 10, 5300, "Read");
-    // table.requestAccess(007, 12, 5300, "Read");
-    // table.buildQueueForFile(5300);
-    // cout << endl;
-    // table.print();
-    // cout << endl;
-    // table.grantAndReleaseAccess(5300);
-    // cout << endl;
-    // table.printUserAccessingFile(5300);
-    // cout << endl;
-    // table.print();
     readFromFile("file.txt");
     return 0;
 }
