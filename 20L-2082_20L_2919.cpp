@@ -184,8 +184,9 @@ public:
         {
             for (int i = 0; i < sizeOfHeap; i++)
             {
-                cout << heap[i].key << "\t";
-                cout << heap[i]._usr.getUserId() << "\t";
+                cout << "Priority\t userID\t \toperationType\n";
+                cout << heap[i].key << "\t\t   ";
+                cout << heap[i]._usr.getUserId() << "\t\t";
                 cout << heap[i]._usr.getOperationType() << " ";
                 cout << endl;
             }
@@ -362,8 +363,8 @@ public:
                     PriorityQueue<T> pq = *it->userQueue;
                     pq.print();
                 }
-                cout << endl;
             }
+            cout << endl;
         }
     }
 
@@ -520,27 +521,30 @@ void readFromFile(string filename)
     {
         while (!file.eof())
         {
-            file >> userId[i] >> priority[i] >> fileId[i] >> accessType[i];
+            file >> fileId[i] >> userId[i] >> priority[i] >> accessType[i];
             hashTable.insert(fileId[i]);
             hashTable.requestAccess(userId[i], priority[i], fileId[i], accessType[i]);
             hashTable.buildQueueForFile(fileId[i]);
             i++;
         }
     }
-    cout << hashTable.getSize(7010) << endl;
-    cout << "---------------------------\n";
-    hashTable.printFileQueue(7010);
-    hashTable.grantAndReleaseAccess(7010);
-    cout << "---------------------------\n";
-    hashTable.printUserAccessingFile(7010);
-    cout << "---------------------------\n";
-    hashTable.userInWaiting(7010);
+    cout << "------------- H A S H T A B L E -------------\n";
+    hashTable.print();
+    int temp = 0;
+    while(temp < i){
+        hashTable.printFileQueue(fileId[temp]);
+        hashTable.grantAndReleaseAccess(fileId[temp]);
+        hashTable.printUserAccessingFile(fileId[temp]);
+        hashTable.userInWaiting(fileId[temp]);
+        temp++;
+    }
+
 
     file.close();
 }
 
 int main()
 {
-    readFromFile("file.txt");
+    readFromFile("gg.txt");
     return 0;
 }
